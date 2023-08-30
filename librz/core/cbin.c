@@ -638,6 +638,13 @@ RZ_API bool rz_core_bin_apply_dwarf(RzCore *core, RzBinFile *binfile) {
 	};
 	RzBinDWARF *dw = rz_bin_dwarf_from_file(binfile, &opt);
 	if (!dw) {
+		const char *filepath = rz_config_get(core->config, "bin.dbginfo.filepath");
+		if (!filepath) {
+			return false;
+		}
+		dw = rz_bin_dwarf_dwo_from_file(core->bin, &opt, filepath);
+	}
+	if (!dw) {
 		return false;
 	}
 

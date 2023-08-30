@@ -121,10 +121,33 @@ RZ_IPI bool RzBinDwarfEncoding_from_file(RzBinDwarfEncoding *encoding, RzBinFile
 	return true;
 }
 
+/**
+ * \brief Load DWARF from split DWARF file
+ * \param bin The RzBin instance
+ * \param opt The RzBinDWARFOption reference
+ * \param filepath The file path
+ * \return RzBinDWARF pointer or NULL if failed
+ */
+RZ_API RZ_OWN RzBinDWARF *rz_bin_dwarf_dwo_from_file(
+	RZ_BORROW RZ_NONNULL RzBin *bin,
+	RZ_BORROW RZ_NONNULL const RzBinDWARFOption *opt,
+	RZ_BORROW RZ_NONNULL const char *filepath) {
+	rz_return_val_if_fail(bin && opt && filepath, NULL);
+	RzBinOptions bopt = { 0 };
+	rz_bin_options_init(&bopt, 0, 0, 0, false);
+	RzBinFile *prev = rz_bin_cur(bin);
+	RzBinFile *bf = rz_bin_open(bin, filepath, &bopt);
+	RET_NULL_IF_FAIL(bf);
+	RzBinDWARF *dwo = rz_bin_dwarf_from_file(bf, opt);
+	AND_DO(prev, rz_bin_file_set_cur_binfile(bin, prev));
+	return dwo;
+}
+
 RZ_API RZ_OWN RzBinDWARF *rz_bin_dwarf_from_file(
 	RZ_BORROW RZ_NONNULL RzBinFile *bf,
 	RZ_BORROW RZ_NONNULL const RzBinDWARFOption *opt) {
 	rz_return_val_if_fail(bf && opt, NULL);
+	RET_NULL_IF_FAIL(get_section(bf, "debug_info"));
 	RzBinDWARF *dw = RZ_NEW0(RzBinDWARF);
 	RET_NULL_IF_FAIL(dw);
 	dw->addr = DebugAddr_from_file(bf);

@@ -1582,6 +1582,10 @@ RZ_API RzBinDwarfLineInfo *rz_bin_dwarf_line_from_file(
 RZ_API void rz_bin_dwarf_line_op_fini(RZ_OWN RZ_NULLABLE RzBinDwarfLineOp *op);
 RZ_API void rz_bin_dwarf_line_info_free(RZ_OWN RZ_NULLABLE RzBinDwarfLineInfo *li);
 
+RZ_API RZ_OWN RzBinDWARF *rz_bin_dwarf_dwo_from_file(
+	RZ_BORROW RZ_NONNULL RzBin *bin,
+	RZ_BORROW RZ_NONNULL const RzBinDWARFOption *opt,
+	RZ_BORROW RZ_NONNULL const char *filepath);
 RZ_API RZ_OWN RzBinDWARF *rz_bin_dwarf_from_file(
 	RZ_BORROW RZ_NONNULL RzBinFile *bf,
 	RZ_BORROW RZ_NONNULL const RzBinDWARFOption *opt);
