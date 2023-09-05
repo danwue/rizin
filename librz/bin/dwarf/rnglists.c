@@ -259,6 +259,11 @@ RZ_API RZ_OWN RzBinDwarfRngListTable *rz_bin_dwarf_rnglists_new_from_buf(
 	bool big_endian,
 	RZ_BORROW RZ_NULLABLE RzBinDwarfDebugAddr *debug_addr) {
 	rz_return_val_if_fail(debug_ranges || debug_rnglists, NULL);
+	RzBuffer *buffer = debug_ranges ? debug_ranges : debug_rnglists;
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfRngListTable *self = RZ_NEW0(RzBinDwarfRngListTable);
 	RET_NULL_IF_FAIL(self);
 	self->debug_addr = debug_addr;

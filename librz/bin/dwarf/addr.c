@@ -23,6 +23,10 @@ RZ_IPI void DebugAddr_free(RzBinDwarfDebugAddr *self) {
 
 RZ_IPI RzBinDwarfDebugAddr *DebugAddr_from_buf(RzBuffer *buffer) {
 	rz_return_val_if_fail(buffer, NULL);
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfDebugAddr *self = RZ_NEW0(RzBinDwarfDebugAddr);
 	RET_NULL_IF_FAIL(self);
 	self->buffer = buffer;

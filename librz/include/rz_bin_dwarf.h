@@ -1571,9 +1571,9 @@ RZ_API RZ_BORROW RzBinDwarfAttr *rz_bin_dwarf_die_get_attr(
 /// .debug_line
 RZ_API RzBinDwarfLineInfo *rz_bin_dwarf_line_from_buf(
 	RZ_BORROW RZ_NONNULL RzBuffer *buffer,
-	bool big_endian,
-	RZ_BORROW RZ_NONNULL RzBinDwarfEncoding *encoding,
 	RZ_BORROW RZ_NULLABLE RzBinDwarfDebugInfo *debug_info,
+	bool big_endian,
+	ut8 address_size,
 	RzBinDwarfLineInfoMask mask);
 RZ_API RzBinDwarfLineInfo *rz_bin_dwarf_line_from_file(
 	RZ_BORROW RZ_NONNULL RzBinFile *bf,

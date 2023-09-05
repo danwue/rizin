@@ -365,6 +365,11 @@ RZ_API RZ_OWN RzBinDwarfLocListTable *rz_bin_dwarf_loclists_new_from_buf(
 	bool big_endian,
 	RZ_BORROW RZ_NULLABLE RzBinDwarfDebugAddr *debug_addr) {
 	rz_return_val_if_fail(debug_loc || debug_loc_lists, NULL);
+	RzBuffer *buffer = debug_loc ? debug_loc : debug_loc_lists;
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfLocListTable *self = RZ_NEW0(RzBinDwarfLocListTable);
 	RET_NULL_IF_FAIL(self);
 	self->debug_addr = debug_addr;

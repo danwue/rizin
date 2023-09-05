@@ -343,6 +343,10 @@ RZ_API RZ_OWN RzBinDwarfDebugInfo *rz_bin_dwarf_info_from_buf(
 	RZ_BORROW RZ_NONNULL RzBinDwarfDebugAbbrevs *debug_abbrevs,
 	RZ_BORROW RZ_NULLABLE RzBinDwarfDebugStr *debug_str) {
 	rz_return_val_if_fail(buffer && debug_abbrevs, NULL);
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfDebugInfo *info = RZ_NEW0(RzBinDwarfDebugInfo);
 	RET_NULL_IF_FAIL(info);
 	ERR_IF_FAIL(RzBinDwarfDebugInfo_init(info));

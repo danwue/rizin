@@ -158,6 +158,10 @@ err:
  */
 RZ_API RzBinDwarfDebugAbbrevs *rz_bin_dwarf_abbrev_from_buf(RZ_OWN RZ_NONNULL RzBuffer *buffer) {
 	rz_return_val_if_fail(buffer, NULL);
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfDebugAbbrevs *abbrevs = RZ_NEW0(RzBinDwarfDebugAbbrevs);
 	RET_FALSE_IF_FAIL(abbrevs);
 	abbrevs->buffer = buffer;

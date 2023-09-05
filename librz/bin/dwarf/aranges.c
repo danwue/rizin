@@ -96,6 +96,11 @@ ok:
 
 RZ_API RzBinDwarfARanges *rz_bin_dwarf_aranges_from_buf(
 	RZ_NONNULL RZ_OWN RzBuffer *buffer, bool big_endian) {
+	rz_return_val_if_fail(buffer, NULL);
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfARanges *aranges = RZ_NEW0(RzBinDwarfARanges);
 	ERR_IF_FAIL(aranges);
 	aranges->list = rz_list_newf((RzListFree)rz_bin_dwarf_arange_set_free);

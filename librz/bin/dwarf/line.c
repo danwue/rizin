@@ -287,7 +287,7 @@ RZ_IPI st64 RzBinDwarfLineHeader_spec_op_advance_line(const RzBinDwarfLineHeader
 static bool RzBinDwarfLineHeader_parse(
 	RzBuffer *buffer,
 	bool big_endian,
-	RzBinDwarfEncoding encoding,
+	ut8 address_size,
 	RzBinDwarfLineHeader *hdr) {
 	rz_return_val_if_fail(hdr && buffer, false);
 	RzBinDwarfLineHeader_init(hdr);
@@ -311,7 +311,7 @@ static bool RzBinDwarfLineHeader_parse(
 		}
 	} else if (hdr->version < 5) {
 		// Dwarf < 5 needs this size to be supplied from outside
-		hdr->address_size = encoding.address_size;
+		hdr->address_size = address_size;
 	}
 
 	RET_FALSE_IF_FAIL(buf_read_offset(buffer, &hdr->header_length, hdr->is_64bit, big_endian));
@@ -634,7 +634,7 @@ static void RzBinDwarfLineUnit_free(RzBinDwarfLineUnit *unit) {
 static RzBinDwarfLineInfo *RzBinDwarfLineInfo_parse(
 	RzBuffer *buffer,
 	bool big_endian,
-	RzBinDwarfEncoding *encoding,
+	ut8 address_size,
 	RzBinDwarfDebugInfo *debug_info,
 	RzBinDwarfLineInfoMask mask) {
 	// Dwarf 3 Standard 6.2 Line Number Information
@@ -661,7 +661,7 @@ static RzBinDwarfLineInfo *RzBinDwarfLineInfo_parse(
 			break;
 		}
 
-		if (!RzBinDwarfLineHeader_parse(buffer, big_endian, *encoding, &unit->header)) {
+		if (!RzBinDwarfLineHeader_parse(buffer, big_endian, address_size, &unit->header)) {
 			RzBinDwarfLineUnit_free(unit);
 			break;
 		}
@@ -719,12 +719,16 @@ RZ_API void rz_bin_dwarf_line_info_free(RZ_OWN RZ_NULLABLE RzBinDwarfLineInfo *l
 
 RZ_API RzBinDwarfLineInfo *rz_bin_dwarf_line_from_buf(
 	RZ_BORROW RZ_NONNULL RzBuffer *buffer,
-	bool big_endian,
-	RZ_BORROW RZ_NONNULL RzBinDwarfEncoding *encoding,
 	RZ_BORROW RZ_NULLABLE RzBinDwarfDebugInfo *debug_info,
+	bool big_endian,
+	ut8 address_size,
 	RzBinDwarfLineInfoMask mask) {
-	rz_return_val_if_fail(buffer && encoding, NULL);
-	return RzBinDwarfLineInfo_parse(buffer, big_endian, encoding, debug_info, mask);
+	rz_return_val_if_fail(buffer, NULL);
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
+	return RzBinDwarfLineInfo_parse(buffer, big_endian, address_size, debug_info, mask);
 }
 
 /**

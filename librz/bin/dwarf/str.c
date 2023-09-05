@@ -17,6 +17,10 @@ RZ_IPI void RzBinDwarfDebugStr_free(RzBinDwarfDebugStr *debug_str) {
 
 RZ_IPI RzBinDwarfDebugStr *RzBinDwarfDebugStr_from_buf(RZ_NONNULL RZ_OWN RzBuffer *buffer) {
 	rz_return_val_if_fail(buffer, NULL);
+	if (rz_buf_size(buffer) <= 0) {
+		rz_buf_free(buffer);
+		return NULL;
+	}
 	RzBinDwarfDebugStr *debug_str = RZ_NEW0(RzBinDwarfDebugStr);
 	RET_NULL_IF_FAIL(debug_str);
 	debug_str->buffer = buffer;
