@@ -626,12 +626,7 @@ RZ_API bool rz_core_bin_apply_main(RzCore *r, RzBinFile *binfile, bool va) {
 	return true;
 }
 
-RZ_API bool rz_core_bin_apply_dwarf(RzCore *core, RzBinFile *binfile) {
-	rz_return_val_if_fail(core && binfile, false);
-	if (!rz_config_get_i(core->config, "bin.dbginfo") || !binfile->o) {
-		return false;
-	}
-
+RZ_API RzBinDWARF *rz_core_bin_dwarf(RzCore *core, RzBinFile *binfile) {
 	RzBinDWARFOption opt = {
 		.line_mask = RZ_BIN_DWARF_LINE_INFO_MASK_LINES,
 		.flags = RZ_BIN_DWARF_ALL - RZ_BIN_DWARF_LOC
@@ -640,10 +635,21 @@ RZ_API bool rz_core_bin_apply_dwarf(RzCore *core, RzBinFile *binfile) {
 	if (!dw) {
 		const char *filepath = rz_config_get(core->config, "bin.dbginfo.filepath");
 		if (!filepath) {
-			return false;
+			return NULL;
 		}
 		dw = rz_bin_dwarf_dwo_from_file(core->bin, &opt, filepath);
 	}
+	
+	return dw;
+}
+
+RZ_API bool rz_core_bin_apply_dwarf(RzCore *core, RzBinFile *binfile) {
+	rz_return_val_if_fail(core && binfile, false);
+	if (!rz_config_get_i(core->config, "bin.dbginfo") || !binfile->o) {
+		return false;
+	}
+
+	RzBinDWARF *dw = rz_core_bin_dwarf(core, binfile);
 	if (!dw) {
 		return false;
 	}
@@ -1710,13 +1716,9 @@ static bool bin_dwarf(RzCore *core, RzBinFile *binfile, RzCmdStateOutput *state)
 		return false;
 	}
 
-	RzBinDwarfLineInfoMask mask = RZ_BIN_DWARF_LINE_INFO_MASK_LINES;
-	mask |= (state->mode == RZ_OUTPUT_MODE_STANDARD ? RZ_BIN_DWARF_LINE_INFO_MASK_OPS : 0);
-	RzBinDWARFOption dw_opt = {
-		.line_mask = mask,
-		.flags = RZ_BIN_DWARF_ALL,
-	};
-	RzBinDWARF *dw = rz_bin_dwarf_from_file(binfile, &dw_opt);
+	RzBinDWARF *dw = core->analysis && core->analysis->debug_info
+		? core->analysis->debug_info->dw
+		: NULL;
 	if (!dw) {
 		return false;
 	}

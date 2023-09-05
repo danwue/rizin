@@ -177,13 +177,13 @@ static bool RzBinDwarfCompUnitHdr_parse(DebugInfo_Context *ctx, RzBinDwarfCompUn
 	U_OR_RET_FALSE(16, hdr->encoding.version);
 
 	if (hdr->encoding.version == 5) {
-		U8_OR_RET_FALSE(hdr->unit_type);
+		U8_OR_RET_FALSE(hdr->ut);
 		U8_OR_RET_FALSE(hdr->encoding.address_size);
 		RET_FALSE_IF_FAIL(buf_read_offset(buffer, &hdr->abbrev_offset, hdr->encoding.is_64bit, big_endian));
 
-		if (hdr->unit_type == DW_UT_skeleton || hdr->unit_type == DW_UT_split_compile) {
-			U8_OR_RET_FALSE(hdr->dwo_id);
-		} else if (hdr->unit_type == DW_UT_type || hdr->unit_type == DW_UT_split_type) {
+		if (hdr->ut == DW_UT_skeleton || hdr->ut == DW_UT_split_compile) {
+			U_OR_RET_FALSE(64, hdr->dwo_id);
+		} else if (hdr->ut == DW_UT_type || hdr->ut == DW_UT_split_type) {
 			U_OR_RET_FALSE(64, hdr->type_sig);
 			RET_FALSE_IF_FAIL(buf_read_offset(buffer, &hdr->type_offset, hdr->encoding.is_64bit, big_endian));
 		}
@@ -208,6 +208,10 @@ static void RzBinDwarfCompUnit_apply(RzBinDwarfCompUnit *unit, RzBinDwarfDie *di
 		case DW_AT_producer:
 			unit->producer = rz_bin_dwarf_attr_get_string_const(attr);
 			break;
+		case DW_AT_GNU_dwo_name:
+		case DW_AT_dwo_name:
+			unit->dwo_name = rz_bin_dwarf_attr_get_string_const(attr);
+			break;
 		case DW_AT_language:
 			unit->language = attr->uconstant;
 			break;
@@ -223,6 +227,7 @@ static void RzBinDwarfCompUnit_apply(RzBinDwarfCompUnit *unit, RzBinDwarfDie *di
 		case DW_AT_str_offsets_base:
 			unit->str_offsets_base = attr->uconstant;
 			break;
+		case DW_AT_GNU_addr_base:
 		case DW_AT_addr_base:
 			unit->addr_base = attr->uconstant;
 			break;

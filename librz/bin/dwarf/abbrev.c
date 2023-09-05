@@ -236,6 +236,9 @@ RZ_API size_t rz_bin_dwarf_abbrev_count(RZ_BORROW RZ_NONNULL const RzBinDwarfDeb
  */
 RZ_API RZ_BORROW RzBinDwarfAbbrevDecl *rz_bin_dwarf_abbrev_get(RZ_BORROW RZ_NONNULL const RzBinDwarfAbbrevTable *tbl, size_t idx) {
 	rz_return_val_if_fail(tbl, NULL);
+	if (idx > rz_vector_len(&tbl->abbrevs)) {
+		return NULL;
+	}
 	return rz_vector_index_ptr(&tbl->abbrevs, idx - 1);
 }
 

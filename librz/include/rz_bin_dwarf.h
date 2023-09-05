@@ -1091,10 +1091,14 @@ typedef struct {
 	ut64 length;
 	// A 4-byte unsigned offset into the .debug_abbrev section.
 	ut64 abbrev_offset;
-	DW_UT unit_type; // DWARF 5 addition
-	ut8 dwo_id; // DWARF 5 addition
-	ut64 type_sig; // DWARF 5 addition
-	ut64 type_offset; // DWARF 5 addition
+	DW_UT ut; // DWARF 5 addition
+	union {
+		ut64 dwo_id; // DWARF 5 addition
+		struct {
+			ut64 type_sig; // DWARF 5 addition
+			ut64 type_offset; // DWARF 5 addition
+		};
+	};
 	ut64 header_size; // excluding length field
 	ut64 unit_offset;
 	RzBinDwarfEncoding encoding;
@@ -1119,6 +1123,7 @@ typedef struct rz_bin_dwarf_comp_unit_t {
 	const char *name;
 	const char *comp_dir;
 	const char *producer;
+	const char *dwo_name;
 	DW_LANG language;
 	ut64 low_pc;
 	ut64 high_pc;
