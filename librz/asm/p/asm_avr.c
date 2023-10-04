@@ -51,6 +51,7 @@ RzAsmPlugin rz_asm_plugin_avr = {
 		"ATmega1280,"
 		"ATmega1281,"
 		"ATmega16,"
+		"ATmega162,"
 		"ATmega168,"
 		"ATmega2560,"
 		"ATmega2561,"
